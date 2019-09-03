@@ -33,15 +33,13 @@ def train(args, model, device, train_loader, optimizer, epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)   #gpu or cpu
         optimizer.zero_grad()   #grad to 0
-        output = model(data)   #forward     
-        #print(data.shape)
-        #print(target)  
+        output = model(data)   #forward       
         #print(output[0,1])  
         loss = F.nll_loss(output, target)  #count loss(cost)
         loss.backward()         #backup propagation   #auto gradient
         optimizer.step()        #adjust & update weight (cnn : kermal map)
         
-        if batch_idx % args.log_interval == 1:   #output status
+        if batch_idx % args.log_interval == 10000:   #output status
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
@@ -61,18 +59,14 @@ def test(args, model, device, test_loader):
             
             tp = target.view_as(pred)  
             match = torch.cat([pred,tp],1)
-
-            print(pred.shape)
-            print(target.shape)            
+            
             #print()
             i=0
             for m in match:
-                print(m[0].item(),'   ',m[1].item(),' :')
-                j=0
-                for num in output[i].numpy():
-                    print(' ',j,':',num)
-                    j+=1
-                i+=1
+                if m[0].item()==m[1].item():
+                    print(m[0].item(),'   ',m[1].item(),'  true')
+                else:
+                    print(m[0].item(),'   ',m[1].item())
 
     test_loss /= len(test_loader.dataset)  #avg loss
 
